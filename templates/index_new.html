@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Student Registration</title>
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='styles.css') }}">
+    <script>
+        function toggleAccordion(tabId) {
+            const tabs = document.querySelectorAll('.accordion-tab');
+            tabs.forEach(tab => {
+                if (tab.id === tabId) {
+                    tab.classList.add('active');
+                } else {
+                    tab.classList.remove('active');
+                }
+            });
+        }
+    </script>
+</head>
+<body>
+<header class="header">
+    <div class="header-content">
+        <h1>Student Registration</h1>
+        <img src="{{ url_for('static', filename='background.jpg') }}" alt="Background Image">
+    </div>
+</header>
+
+<nav class="tabs">
+    <!-- Accordion Menu for Tabs -->
+    <div class="accordion">
+        <button class="accordion-button" onclick="toggleAccordion('register-tab')">Register Student</button>
+        <button class="accordion-button" onclick="toggleAccordion('student-details-tab')">Student Details</button>
+    </div>
+</nav>
+
+<div class="tab-content">
+    <!-- Register Student Tab -->
+    <div class="accordion-tab" id="register-tab">
+        <div class="form-container">
+            <h2>Register Student</h2>
+            <form method="POST" action="/register">
+                <div class="form-group">
+                    <label for="first_name">First Name:</label>
+                    <input type="text" id="first_name" name="first_name" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="last_name">Last Name:</label>
+                    <input type="text" id="last_name" name="last_name" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="email">Email Address:</label>
+                    <input type="email" id="email" name="email" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="phone_number">Phone Number:</label>
+                    <input type="tel" id="phone_number" name="phone_number" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="dob">Date of Birth:</label>
+                    <input type="date" id="dob" name="dob" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="department">Department:</label>
+                    <select id="department" name="department" required>
+                        <option value="Computer Science">Computer Science</option>
+                        <option value="Electrical Engineering">Electrical Engineering</option>
+                        <option value="Electronics and Communication Engineering">Electronics and Communication Engineering</option>
+                        <option value="Mechanical Engineering">Mechanical Engineering</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="academic_year">Academic Year:</label>
+                    <input type="text" id="academic_year" name="academic_year" required>
+                </div>
+
+                <div class="form-group">
+                    <input type="submit" value="Register">
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Student Details Tab -->
+    <div class="accordion-tab" id="student-details-tab">
+        <div class="form-container">
+            <h2>Student Details</h2>
+            <form method="POST" action="/student-details">
+                <div class="form-group">
+                    <label for="email_to_search">Enter Email to Search:</label>
+                    <input type="email" id="email_to_search" name="email_to_search" required>
+                </div>
+
+                <div class="form-group">
+                    <input type="submit" value="Search">
+                </div>
+            </form>
+            {% if student_data %}
+            <h3>Student Details:</h3>
+            <p>First Name: {{ student_data[0] }}</p>
+            <p>Last Name: {{ student_data[1] }}</p>
+            <p>Email: {{ student_data[2] }}</p>
+            <p>Phone Number: {{ student_data[3] }}</p>
+            <p>Date of Birth: {{ student_data[4] }}</p>
+            <p>Department: {{ student_data[5] }}</p>
+            <p>Academic Year: {{ student_data[6] }}</p>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<!--&lt;!&ndash; Additional Content for Student Details Display &ndash;&gt;-->
+<!--<div class="student-details">-->
+<!--    &lt;!&ndash; Student Details... &ndash;&gt;-->
+<!--</div>-->
+</body>
+</html>
