@@ -25,7 +25,7 @@
     <div class="accordion-tab" id="register-tab" style="display: none;">
         <div class="form-container">
             <h2>Register Student</h2>
-            <form method="POST" action="/register" onsubmit="return registerStudent();">
+            <form action="/register" method="POST">
                 <div id="success-message" class="success-message"></div>
                 <div class="form-group">
                     <label for="first_name">First Name:</label>
@@ -71,6 +71,7 @@
                     <input type="submit" value="Register">
                 </div>
             </form>
+            <p id="message"></p>
         </div>
     </div>
 
@@ -78,60 +79,66 @@
     <div class="accordion-tab" id="student-details-tab" style="display: none;">
         <div class="form-container">
             <h2>Student Details</h2>
-            <form>
-                <div class="form-group">
-                    <label for="email_to_search">Enter Email to Search:</label>
-                    <input type="email" id="email_to_search" name="email_to_search" required>
-                </div>
-
-                <div class="form-group">
-                    <button type="button" id="fetchStudentDetails" onclick="getStudentDetails()">Fetch Student Details</button>
-<!--                    <input type="submit" value="Search">-->
-                </div>
+            <form action="/user" method="GET">
+                <label for="userId">User ID:</label>
+                <input type="number" id="userId" name="userId" required><br><br>
+                <input type="submit" value="Get User Details">
             </form>
-            {% if student_data %}
-            <h3>Student Details:</h3>
-            <p>First Name: {{ student_data[0] }}</p>
-            <p>Last Name: {{ student_data[1] }}</p>
-            <p>Email: {{ student_data[2] }}</p>
-            <p>Phone Number: {{ student_data[3] }}</p>
-            <p>Date of Birth: {{ student_data[4] }}</p>
-            <p>Department: {{ student_data[5] }}</p>
-            <p>Academic Year: {{ student_data[6] }}</p>
-            {% endif %}
+            <!-- Display User Details Here -->
+            <div id="userDetails"></div>
         </div>
     </div>
 </div>
 
-<!-- Additional Content for Student Details Display -->
-<div class="student-details">
-    <!-- Student Details... -->
-</div>
 <script>
-    // Function to display a success message and clear form fields
-    function displaySuccessMessage(email) {
-        const successMessage = document.getElementById('success-message');
-        successMessage.innerText = `Student with email ${email} is registered successfully.`;
+    const form = document.querySelector('form');
+    const message = document.getElementById('message');
 
-        // Clear form fields
-        document.getElementById('first_name').value = '';
-        document.getElementById('last_name').value = '';
-        document.getElementById('email').value = '';
-        document.getElementById('phone_number').value = '';
-        document.getElementById('dob').value = '';
-        document.getElementById('department').value = '';
-        document.getElementById('academic_year').value = '';
+    form.addEventListener('submit', async (e) => {
+        e.preventDefault();
 
-        // Show the success message
-        successMessage.style.display = 'block';
+        const formData = new FormData(form);
+        const response = await fetch('/register', {
+            method: 'POST',
+            body: JSON.stringify(Object.fromEntries(formData)),
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        });
 
-        // Hide the success message after 3 seconds
-        setTimeout(function () {
-            successMessage.style.display = 'none';
-            successMessage.innerText = ''; // Clear message text
-        }, 3000);
-    }
+        const data = await response.json();
+        message.textContent = data.message + " - ID: " + data.user_id;
+    });
 
+    const userDetailsForm = document.querySelector('form[action="/user"]');
+        const userDetailsDiv = document.getElementById('userDetails');
+
+        userDetailsForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const userId = document.getElementById('userId').value;
+            const response = await fetch(`/user/${userId}`, {
+                method: 'GET'
+            });
+            const data = await response.json();
+
+            if (response.ok) {
+                const userDetailsHtml = `
+                    <h3>User Details:</h3>
+                    <table>
+                    <tr><td>User ID:</td><td> ${data.user_id}</td>
+                    <tr><td>First Name:</td><td> ${data.first_name}</td>
+                    <tr><td>Last Name:</td><td> ${data.last_name}</td>
+                    <tr><td>Email:</td><td> ${data.email}</td>
+                    <tr><td>Department:</td><td> ${data.department}</td>
+                    <tr><td>Department:</td><td> ${data.dob}</td>
+                    <tr><td>Department:</td><td> ${data.academic_year}</td></table>
+                `;
+                userDetailsDiv.innerHTML = userDetailsHtml;
+            } else {
+                userDetailsDiv.innerHTML = `<p>${data.message}</p>`;
+            }
+        });
     function toggleAccordion(tabId) {
         const tabs = document.querySelectorAll('.accordion-tab');
         tabs.forEach(tab => {
@@ -142,57 +149,10 @@
             }
         });
     }
-
-    function registerStudent() {
-        // Get student data from the form
-        const first_name = document.getElementById('first_name').value;
-        const last_name = document.getElementById('last_name').value;
-        const email = document.getElementById('email').value;
-        const phone_number = document.getElementById('phone_number').value;
-        const dob = document.getElementById('dob').value;
-        const department = document.getElementById('department').value;
-        const academic_year = document.getElementById('academic_year').value;
-
-        // Check if the email already exists (you can use AJAX or server-side check here)
-
-        // Assuming the registration is successful
-        // Add your logic to save student data to a CSV or database here
-
-        // Display a success message and clear form fields
-        displaySuccessMessage(email);
-
-        // Return false to prevent the form from actually submitting
-        return false;
-    }
-
-    function getStudentDetails() {
-            const email = document.getElementById('email').value;
-            alert(email)
-            // Make a GET request to fetch student details
-            fetch(`/student-details?email=${encodeURIComponent(email)}`)
-                .then(response => response.json())
-                .then(data => {
-                    if (data.error) {
-                        alert(data.error);
-                    } else {
-                        // Display student details in the form
-                        document.getElementById('first_name').value = data.first_name;
-                        document.getElementById('last_name').value = data.last_name;
-                        document.getElementById('phone_number').value = data.phone_number;
-                        document.getElementById('dob').value = data.dob;
-                        document.getElementById('department').value = data.department;
-                        document.getElementById('academic_year').value = data.academic_year;
-                    }
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                    alert('An error occurred while fetching student details.');
-                });
-        }
-    // Automatically activate the "Register Student" tab on page load
+     // Automatically activate the "Register Student" tab on page load
     window.onload = function() {
         toggleAccordion('register-tab');
-        document.querySelector('.accordion-button[data-tab="register-tab"]').classList.add('active');
+<!--        document.querySelector('.accordion-button[data-tab="register-tab"]').classList.add('active');-->
     };
 </script>
 </body>

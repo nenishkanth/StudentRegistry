@@ -1,0 +1,3 @@
+curl -X POST -H "Content-Type: application/json" -d '{"firstname": "John", "lastname": "Doe", "email": "john.doe@example.com", "department": "HR"}' http://localhost:5000/register
+
+curl http://localhost:5000/user/1

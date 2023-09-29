@@ -1,9 +1,9 @@
+from flask import Flask, request, jsonify
 import csv
-
-from flask import Flask, render_template, request, jsonify
 
 app = Flask(__name__)
 
+# Define the path to your CSV file
 CSV_FILE = 'student_data.csv'
 
 # Function to get the next available user ID
@@ -18,10 +18,7 @@ def get_next_user_id():
     except FileNotFoundError:
         return 1  # If the file doesn't exist, start with 1
 
-@app.route('/')
-def index():
-    return render_template('index.html')
-
+# Route for user registration
 @app.route('/register', methods=['POST'])
 def register():
     # Get input datadata = {dict: 7} {'academic_year': '2022', 'department': 'Computer Science', 'dob': '2000-11-05', 'email': 'ezone.dk@gmail.com', 'first_name': 'Dilipkumar', 'last_name': 'Nallusamy', 'phone_number': '9600177834'}
